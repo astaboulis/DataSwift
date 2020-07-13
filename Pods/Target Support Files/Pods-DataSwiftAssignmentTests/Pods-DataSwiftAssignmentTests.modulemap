@@ -1,0 +1,6 @@
+framework module Pods_DataSwiftAssignmentTests {
+  umbrella header "Pods-DataSwiftAssignmentTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
