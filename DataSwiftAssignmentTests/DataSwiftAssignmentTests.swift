@@ -26,10 +26,11 @@ class DataSwiftAssignmentTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         let expectation = self.expectation(description: "testing")
         let viewModel = TMDBViewModel()
-        viewModel.fetchMovies(searchString: "comedy") { (json) in
-            XCTAssert(json.count > 0)
+        viewModel.fetchMovies(searchString: "comedy") { (array) in
+            XCTAssert(array.count > 0)
             expectation.fulfill()
         }
+        
       
         waitForExpectations(timeout: 5, handler: nil)
     }
