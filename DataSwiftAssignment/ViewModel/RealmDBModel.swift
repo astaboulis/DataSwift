@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Realm
 import RealmSwift
 
 class RealmDBModel{
@@ -16,14 +17,13 @@ class RealmDBModel{
     static let sharedInstance  = RealmDBModel()
     
     private init(){
-            let config = Realm.Configuration(schemaVersion:2)
-        
-            realm = try! Realm(configuration: config)
+        let config = Realm.Configuration(schemaVersion:2)
+        realm = try! Realm(configuration: config)
     }
     
     func addItem(item:RealmModel) {
         try! realm.write{
-                realm.add(item, update: .all)
+            realm.add(item, update: .all)
         }
     }
     
@@ -32,9 +32,4 @@ class RealmDBModel{
         return results
     }
     
-    func deleteRecords(){
-        try! realm.beginWrite()
-        realm.delete(getItems())
-        try! realm.commitWrite()
-    }
 }

@@ -13,6 +13,14 @@ class RealmModel:Object{
     @objc dynamic var id=0
     @objc dynamic var poster = ""
     @objc dynamic var title = ""
+    
+    convenience init(id:Int,poster:String,title:String){
+        self.init()
+        self.id = id
+        self.title = title
+        self.poster = poster
+    }
+    
     override class func primaryKey() -> String? {
         return "id"
     }

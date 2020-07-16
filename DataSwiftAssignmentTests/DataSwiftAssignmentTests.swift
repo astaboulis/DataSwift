@@ -27,7 +27,7 @@ class DataSwiftAssignmentTests: XCTestCase {
         let expectation = self.expectation(description: "testing")
         let viewModel = TMDBViewModel()
         viewModel.fetchMovies(searchString: "comedy") { (json) in
-            XCTAssert(json["results"].count > 0)
+            XCTAssert(json.count > 0)
             expectation.fulfill()
         }
       

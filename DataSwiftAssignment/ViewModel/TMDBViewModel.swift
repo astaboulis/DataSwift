@@ -23,8 +23,11 @@ class TMDBViewModel:TMDBViewModelDelegate{
     
     func loadMovies(completion: @escaping () -> ()) {
         
-        fetchMovies(searchString: "comedy") { (array) in
+        fetchMovies(searchString: "sex") { (array) in
             self.moviesModel = array
+            for countMovies in 0..<self.moviesModel.count{
+                RealmDBModel.sharedInstance.addItem(item:RealmModel(id:countMovies,poster: array[countMovies].poster!, title: array[countMovies].title!))
+            }
             completion()
         }
     }
@@ -37,13 +40,9 @@ class TMDBViewModel:TMDBViewModelDelegate{
         let request = URLRequest(url: urlMain!)
         Alamofire.request(request as URLRequestConvertible).responseJSON { (response) in
             let json = JSON(response.result.value!)
-            RealmDBModel.sharedInstance.deleteRecords()
             for counter in 0..<json["results"].count{
                 self.moviesModel.append(TMDBModel(title:json["results"][counter]["title"].stringValue, poster: "https://image.tmdb.org/t/p/w500/"+json["results"][counter]["poster_path"].stringValue))
-                let itemRealm = RealmModel()
-                itemRealm.title = json["results"][counter]["title"].stringValue
-                itemRealm.poster = "https://image.tmdb.org/t/p/w500/"+json["results"][counter]["poster_path"].stringValue
-                RealmDBModel.sharedInstance.addItem(item: itemRealm)
+            
             }
             completion(self.moviesModel)
         }
@@ -54,6 +53,7 @@ class TMDBViewModel:TMDBViewModelDelegate{
     }
     
     func getMovie(indexPath:IndexPath) -> TMDBModel {
+        
         return moviesModel[indexPath.row]
     }
     

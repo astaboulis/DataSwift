@@ -11,6 +11,8 @@ import SDWebImage
 import Network
 
 protocol FillTableViewDelegate{
+    func loadTables()
+    func loadCell(cell:TMDBCellTableViewCell,indexPath:IndexPath)
     func fillTable()
     func fillTableOffline()
     func fillTableCell(cell:TMDBCellTableViewCell,indexPath:IndexPath)
@@ -29,11 +31,6 @@ class TMDBController: UITableViewController {
     
     var countMovies:Int=0
     
-    var movies:[TMDBModel]=[]{
-        didSet{
-            self.tableView.reloadData()
-        }
-    }
     var moviesOffline:[RealmModel]=[]{
         didSet{
             self.tableView.reloadData()
@@ -42,23 +39,7 @@ class TMDBController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
-        let semaphore = DispatchSemaphore(value: 0)
-        monitor.pathUpdateHandler = { pathUpdateHandler in
-            if pathUpdateHandler.status == .satisfied {
-                self.fillTable()
-                self.isConnected = true
-            } else {
-                self.fillTableOffline()
-                self.isConnected = false
-            }
-            semaphore.signal()
-        }
-        
-        monitor.start(queue: queue)
-        
-        semaphore.wait()
-        
-        
+        loadTables()
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -88,12 +69,7 @@ class TMDBController: UITableViewController {
     }
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell:TMDBCellTableViewCell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TMDBCellTableViewCell
-        if isConnected {
-            self.fillTableCell(cell: cell, indexPath: indexPath)
-        }
-        else{
-            self.fillOfflineTableCell(cell: cell, indexPath: indexPath)
-        }
+        loadCell(cell: cell, indexPath: indexPath)
         return cell
     }
     /*
@@ -158,6 +134,36 @@ extension TMDBController {
     }
 }
 extension TMDBController:FillTableViewDelegate{
+    func loadCell(cell:TMDBCellTableViewCell,indexPath:IndexPath) {
+        if isConnected {
+            self.fillTableCell(cell: cell, indexPath: indexPath)
+        }
+        else{
+            self.fillOfflineTableCell(cell: cell, indexPath: indexPath)
+        }
+    }
+    
+    
+    func loadTables() {
+        let semaphore = DispatchSemaphore(value: 0)
+        monitor.pathUpdateHandler = { pathUpdateHandler in
+            if pathUpdateHandler.status == .satisfied {
+                self.fillTable()
+                self.isConnected = true
+            } else {
+                self.fillTableOffline()
+                self.isConnected = false
+            }
+            semaphore.signal()
+        }
+        
+        monitor.start(queue: queue)
+        
+        semaphore.wait()
+        
+        
+    }
+    
     
     func fillTableOffline() {
         for countMovies in 0..<RealmDBModel.sharedInstance.getItems().count{
